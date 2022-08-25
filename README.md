@@ -1,7 +1,7 @@
 # Cronômetro
  Projeto criado com objetivo de aprendizado e de ter notado vários códigos com algumas alterações nas trocas de 59s para 1m.
  Quando chegava na troca de segundos para minutos ocorria uma pequena alteração na contagem.
- Esse código teve o objetivo de reparar também esse problema analisado.
+ 
  
  Abaixo encontra-se o cronômetro feito
  
