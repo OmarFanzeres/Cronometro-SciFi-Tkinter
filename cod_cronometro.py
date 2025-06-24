@@ -1,105 +1,89 @@
-from tkinter import *
 import tkinter as tk
 
-janela = Tk()
-janela.title("Cronômetro")
-janela.geometry('310x190')
-janela.resizable(width=FALSE, height=FALSE)
-janela.configure(background='black')
-janela.tk.call('wm', 'iconphoto', janela._w, tk.PhotoImage(file='cronometro/cronometro.png'))
+# Configuração da janela principal
+root = tk.Tk()
+root.title("Contador de Tempo")
+root.geometry("310x190")
+root.resizable(False, False)
+root.configure(bg='black')
+root.tk.call('wm', 'iconphoto', root._w, tk.PhotoImage(file='cronometro/cronometro.png'))
 
+# Variáveis globais
+tempo_atual = '00:00:00'
+contador = -3
+executando = False
 
-global tempo
-tempo = '00:00:00'
+# Função responsável por atualizar o tempo
+def atualizar_tempo():
+    def contar():
+        if executando:
+            global contador, tempo_atual
 
-count = -3
-run = False
-
-
-# Funcao iniciar
-def iniciar():
-    def valor():
-        if run:
-            global count
-            global tempo
-            # antes de comecar
-            if count <= -1:
-                inicio = "começando em " + str(abs(count))
-                label_time['text'] = inicio
-                label_time['font'] = 'Arial 25'
+            if contador < 0:
+                mensagem = f"Início em {abs(contador)}"
+                visor['text'] = mensagem
+                visor['font'] = ('Arial', 25)
             else:
-                label_time['font'] = 'Arial 50'
-                d = str(tempo)
-                h, m, s = map(int, d.split(":"))
-                h = int(h)
-                m = int(m)
-                s = int(count)
+                visor['font'] = ('Arial', 50)
+                horas, minutos, segundos = map(int, tempo_atual.split(":"))
+                segundos = contador
 
-                if(s == 59):
-                    count = -1
-                    m += 1
+                if segundos == 59:
+                    contador = -1
+                    minutos += 1
 
-                s = str(0)+str(s)
-                m = str(0)+str(m)
-                h = str(0)+str(h)
+                tempo_atual_formatado = f"{horas:02d}:{minutos:02d}:{segundos:02d}"
+                visor['text'] = tempo_atual_formatado
+                tempo_atual = tempo_atual_formatado
 
-                d = str(h[-2:])+":"+str(m[-2:])+":"+str(s[-2:])
-                label_time['text'] = d
-                tempo = d
+            visor.after(1000, contar)
+            contador += 1
 
-                s = int(count)
-                m = int(m)
-                h = int(h)
+    contar()
 
-            label_time.after(1000, valor)
-            count += 1
-    valor()
+# Comandos dos botões
+def iniciar_contagem():
+    global executando
+    executando = True
+    atualizar_tempo()
 
-# Funcao para iniciar cronômetro
-def start():
-    global run
-    run = True
-    iniciar()
+def pausar_contagem():
+    global executando
+    executando = False
 
-# Funacao para pausar
-def stop():
-    global run
-    run = False
-
-# funcao para reiniciar
-def reset():
-    global count
-    count = -3
-
-    # Se estiver pausado ira reiniciar do zero
-    if run == False:
-        global tempo
-        tempo = '00:00:00'
-        label_time['text'] = tempo
-
-    # Se nao estiver pausado ira continuar onde parou antes
+def reiniciar_contagem():
+    global contador, tempo_atual
+    contador = -3
+    if not executando:
+        tempo_atual = '00:00:00'
+        visor['text'] = tempo_atual
     else:
-        label_time['font'] = 'Times 30 '
-        label_time['text'] = 'Iniciando...'
+        visor['font'] = ('Times', 30)
+        visor['text'] = 'Reiniciando...'
 
-label_time = Label(janela, text=tempo, font=(
-    'Arial 50'), bg='black', fg='white')
-label_time.grid(row=0, column=0, sticky=NSEW, padx=15, pady=20)
+# Interface do visor
+visor = tk.Label(root, text=tempo_atual, font=('Arial', 50), bg='black', fg='white')
+visor.grid(row=0, column=0, padx=15, pady=20, sticky='nsew')
 
-frameBaixo = Frame(janela, width=310, height=350, bg='black', relief="flat")
-frameBaixo.grid(row=1, column=0, pady=0, padx=30, sticky=NSEW)
+# Frame com os botões
+botoes_frame = tk.Frame(root, bg='black', width=310, height=350)
+botoes_frame.grid(row=1, column=0, padx=30, sticky='nsew')
 
-botao_iniciar = Button(frameBaixo, command=start, text="Iniciar", width=10, height=2,
-                     bg='green', fg='white', font=('Ivy 8 bold'), relief=RAISED, overrelief=RIDGE)
-botao_iniciar.grid(row=0, column=0, sticky=NSEW, padx=2, pady=10)
+# Botões
+btn_iniciar = tk.Button(botoes_frame, text="Iniciar", command=iniciar_contagem,
+                        bg='green', fg='white', font=('Ivy', 8, 'bold'), width=10, height=2,
+                        relief=tk.RAISED, overrelief=tk.RIDGE)
+btn_iniciar.grid(row=0, column=0, padx=2, pady=10)
 
-botao_pausar = Button(frameBaixo, command=stop, text="Pausar", width=10, height=2,
-                    bg='red', fg='white', font=('Ivy 8 bold'), relief=RAISED, overrelief=RIDGE)
-botao_pausar.grid(row=0, column=1, sticky=NSEW, padx=2, pady=10)
+btn_pausar = tk.Button(botoes_frame, text="Pausar", command=pausar_contagem,
+                       bg='red', fg='white', font=('Ivy', 8, 'bold'), width=10, height=2,
+                       relief=tk.RAISED, overrelief=tk.RIDGE)
+btn_pausar.grid(row=0, column=1, padx=2, pady=10)
 
-botao_reiniciar = Button(frameBaixo, command=reset, text="Reiniciar", width=10, height=2,
-                     bg='blue', fg='white', font=('Ivy 8 bold'), relief=RAISED, overrelief=RIDGE)
-botao_reiniciar.grid(row=0, column=2, sticky=NSEW, padx=2, pady=10)
+btn_reiniciar = tk.Button(botoes_frame, text="Reiniciar", command=reiniciar_contagem,
+                          bg='blue', fg='white', font=('Ivy', 8, 'bold'), width=10, height=2,
+                          relief=tk.RAISED, overrelief=tk.RIDGE)
+btn_reiniciar.grid(row=0, column=2, padx=2, pady=10)
 
-
-janela.mainloop()
+# Início do loop da aplicação
+root.mainloop()
